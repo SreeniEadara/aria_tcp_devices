@@ -34,7 +34,4 @@ while True:
         print("no data")
         continue
 
-    connection.send("DONE")
-    connection.close()
-
-    print("closed connection")
+    print("performed action")
