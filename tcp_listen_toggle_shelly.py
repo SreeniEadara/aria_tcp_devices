@@ -1,5 +1,7 @@
 import socket
 import requests
+import threading
+import queue
 
 TCP_IP = "127.0.0.1" # localhost
 TCP_PORT = 18
@@ -17,8 +19,13 @@ def toggle_shelly_http(state:bool):
     # Only returns when GET request is responded to by Shelly
     requests.get("http://" + SHELLY_IP + "/rpc/Switch.Set?id=0&on=" + state_str)
 
-def enable_bluetooth_shelly():
-    requests.get('http://192.168.33.1/rpc/BLE.SetConfig?config={"enable":true,"rpc":{"enable":true}}')
+toggle_queue = queue.Queue()
+
+def worker():
+    while True:
+        toggle_shelly_http(toggle_queue.get())
+        toggle_queue.task_done()
+threading.Thread(target=worker, daemon=True).start()
 
 while True:
     print("waiting for instruction . . .")
@@ -30,9 +37,9 @@ while True:
 
     data_as_str = data.decode()
     if data_as_str.find("ON") >= 0:
-        toggle_shelly_http(True)
+        toggle_queue.put(True)
     elif data_as_str.find("OFF") >= 0:
-        toggle_shelly_http(False)
+        toggle_queue.put(False)
     else:
         print("no data")
         continue
