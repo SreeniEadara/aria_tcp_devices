@@ -22,7 +22,7 @@ def toggle_shelly_http(state:bool):
     requests.get("http://" + SHELLY_IP + "/rpc/Switch.Set?id=0&on=" + state_str)
 
     print()
-    print(str(localtime().tm_hour) + ":" + str(localtime().tm_min))
+    print(str(localtime().tm_hour).zfill(2) + ":" + str(localtime().tm_min).zfill(2))
     state_str = "ON" if state else "OFF"
     print("SHELLY OUTPUT SET: " + state_str)
 
@@ -40,7 +40,7 @@ def keepalive_shelly():
         state_str = "ON" if state_bool else "OFF"
         
         print()
-        print(str(localtime().tm_hour) + ":" + str(localtime().tm_min))
+        print(str(localtime().tm_hour).zfill(2) + ":" + str(localtime().tm_min).zfill(2))
         print("SHELLY OUTPUT STATE: " + state_str)
         sleep(SHELLY_KEEPALIVE_INTERVAL_SECONDS)
 threading.Thread(target=keepalive_shelly, daemon=True).start()
