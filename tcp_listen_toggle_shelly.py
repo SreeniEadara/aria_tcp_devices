@@ -26,7 +26,7 @@ def toggle_shelly_http(state:bool):
     state_str = "ON" if state else "OFF"
     print("SHELLY OUTPUT SET: " + state_str)
 
-toggle_queue = queue.Queue()
+toggle_queue = queue.Queue(0)
 
 def worker():
     while True:
@@ -45,21 +45,18 @@ def keepalive_shelly():
         sleep(SHELLY_KEEPALIVE_INTERVAL_SECONDS)
 threading.Thread(target=keepalive_shelly, daemon=True).start()
 
+(connection, address) = tcp_socket.accept()
+
 while True:
-    #print("waiting for instruction . . .")
-    (connection, address) = tcp_socket.accept()
-    #print("connected")
-
     data = connection.recv(TCP_BUF_SIZE)
-    #print("recieved data")
 
+    if data == b'':
+        break
     data_as_str = data.decode()
     if data_as_str.find("ON") >= 0:
         toggle_queue.put(True)
-    elif data_as_str.find("OFF") >= 0:
+    if data_as_str.find("OFF") >= 0:
         toggle_queue.put(False)
-    else:
-        #print("no data")
-        continue
 
-    #print("performed action")
+# Wait for all tasks on queue to be completed
+toggle_queue.join()
