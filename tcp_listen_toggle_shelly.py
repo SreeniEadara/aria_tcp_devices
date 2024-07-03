@@ -13,7 +13,7 @@ TCP_BUF_SIZE = 1024
 SHELLY_IP = "192.168.33.1" # default Shelly IP
 SHELLY_KEEPALIVE_INTERVAL_SECONDS = 120
 
-pidfile = tempfile.NamedTemporaryFile(mode='w', prefix='shelly_' + str(os.getpid()) + '_', suffix='.pid')
+pidfile = tempfile.NamedTemporaryFile(mode='w', prefix='shelly_' + str(os.getpid()) + '_', suffix='.pid', delete=True)
 pidfile.write(str(os.getpid()))
 print('pid file created at:')
 print(pidfile.name)
@@ -67,3 +67,4 @@ while True:
 
 # Wait for all tasks on queue to be completed
 toggle_queue.join()
+pidfile.close()
