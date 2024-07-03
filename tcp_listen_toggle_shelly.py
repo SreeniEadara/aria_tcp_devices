@@ -3,6 +3,8 @@ import requests
 import threading
 import queue
 from time import sleep, localtime
+import tempfile
+import os
 
 TCP_IP = "127.0.0.1" # localhost
 TCP_PORT = 18
@@ -10,6 +12,11 @@ TCP_BUF_SIZE = 1024
 
 SHELLY_IP = "192.168.33.1" # default Shelly IP
 SHELLY_KEEPALIVE_INTERVAL_SECONDS = 120
+
+pidfile = tempfile.NamedTemporaryFile(mode='w', prefix='shelly_' + str(os.getpid()) + '_', suffix='.pid')
+pidfile.write(str(os.getpid()))
+print('pid file created at:')
+print(pidfile.name)
 
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.bind((TCP_IP, TCP_PORT))
