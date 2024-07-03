@@ -60,9 +60,18 @@ while True:
     if data == b'':
         break
     data_as_str = data.decode()
-    if data_as_str.find("ON") >= 0:
+
+    # Get indices of "ON" or "OFF" in the tcp message.
+    # -1 if none.
+    # Note that tcp messages sent back-to-back may be caught in the same recv!
+    # We have to see which message was most recent (last) and change to that state.
+    # Do nothing if the indices are the same (only possible if both are -1 so message was bad).
+    on_text_message_index = data_as_str.rfind("ON")
+    off_text_message_index = data_as_str.rfind("OFF")
+
+    if on_text_message_index > off_text_message_index:
         toggle_queue.put(True)
-    if data_as_str.find("OFF") >= 0:
+    if off_text_message_index > on_text_message_index:
         toggle_queue.put(False)
 
 # Wait for all tasks on queue to be completed
